@@ -6,6 +6,15 @@ package crypto;
  */
 public class Util {
 
+
+    static String charLineToString(char[] line) {
+        String result = "";
+        for (int i = 0; i < line.length; ++i) {
+            result += line[i];
+        }
+        return result;
+    }
+
     public static void printCharLineInHex(char[] line) {
         for (int i = 0; i < line.length; i++) {
             System.out.println(i + ": " + Integer.toHexString(line[i]));

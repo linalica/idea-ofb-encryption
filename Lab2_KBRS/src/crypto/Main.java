@@ -9,24 +9,26 @@ public class Main {
     public static void main(String[] args) {
 
         String text = Reader.readFromFile();
-        String keyFull = "GulevichUlyana";
 
-        char [] key = keyFull.substring(0, 8).toCharArray();    //128 bit
-        char[] block = text.substring(0, 4).toCharArray();      // 64 bit
+        String keyFull = generateKey();
+        String initVectorStr = generateInitVrctor();
 
+        String encText = Encoder.encodeText(text, keyFull, initVectorStr);
+        String decText = Encoder.encodeText(encText, keyFull, initVectorStr);
 
-        char[] encodedBlock = Encoder.encodeBlock(block, Encoder.findEncodingKeys(key));
-
-        char[] decText = Encoder.encodeBlock(encodedBlock, Encoder.findDecodingKeys(key));
-        System.out.println("final dec: ");
+        System.out.println(text);
+        System.out.println(encText);
         System.out.println(decText);
 
     }
 
+    private static String generateKey(){
+        return "GulevichUlyana";
+    }
 
-
-
-
+    private static String generateInitVrctor(){
+        return "UlyanaGulevich";
+    }
 
 
 

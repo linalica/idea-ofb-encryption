@@ -8,12 +8,39 @@ import java.math.BigInteger;
  */
 public class Encoder {
 
-    public static char[] encodeBlock(char[] block, char[] keys) {
-        for (int i = 0; i < 8; ++i) {
-            round(block, keys, i);
+
+    public static String encodeText(String text, String keyFull, String initVectorFull ){
+        int textLength = text.length();
+        text += "    ";
+        char[] key = keyFull.substring(0, 8).toCharArray();                     //128 bit
+        char[] initVector = initVectorFull.substring(0, 4).toCharArray();       // 64 bit
+        char[] currentInitVector = initVector.clone();
+        String encodedText = "";
+        for (int i = 0; i < Math.floor(text.length()/4); ++i) {
+            currentInitVector = Encoder.encodeBlock(currentInitVector, Encoder.findEncodingKeys(key));
+            char[] blockOpen = text.substring(i * 4, (i + 1) * 4).toCharArray();
+            char[] blockClosed = Encoder.xorCharLines(currentInitVector, blockOpen);
+            encodedText += Util.charLineToString(blockClosed);
         }
-        round9(block, keys);
-        return block;
+        return encodedText.substring(0, textLength);
+    }
+
+
+    private static char[] encodeBlock(char[] block, char[] keys) {
+        char [] result = block.clone();
+        for (int i = 0; i < 8; ++i) {
+            round(result, keys, i);
+        }
+        round9(result, keys);
+        return result;
+    }
+
+    private static char[] xorCharLines(char[] block1, char[] block2) {
+        char [] result = block1.clone();
+        for (int i = 0; i < block1.length; ++i) {
+            result[i] = (char)(block1[i] ^ block2[i]);
+        }
+        return result;
     }
 
     private static char[] round9(char[] block, char[] keys) {
@@ -55,7 +82,7 @@ public class Encoder {
     }
 
 
-    public static char[] findDecodingKeys(char[] key) {
+    private static char[] findDecodingKeys(char[] key) {
 
         char[] eKeys = findEncodingKeys(key);
         char[] dKeys = new char[52];
@@ -82,7 +109,7 @@ public class Encoder {
         return dKeys;
     }
 
-    public static char[] findEncodingKeys(char[] key) {
+    private static char[] findEncodingKeys(char[] key) {
         StringBuilder keySB = charLineToSB(key);
         StringBuilder largeKeySB = toLargeKey(keySB);
         char[] keys = splitLargeKeyToCharLine(largeKeySB);
@@ -119,17 +146,15 @@ public class Encoder {
         return keys;
     }
 
-
-
-    static char multInver(char x) {
+    private static char multInver(char x) {
         return (char) new BigInteger(Integer.toString(x)).modInverse(new BigInteger("65537")).intValue();
     }
 
-    static char addInver(long x) {
+    private static char addInver(long x) {
         return (char) (65536 - x);
     }
 
-    static char mulMod(long x, long y) {
+    private static char mulMod(long x, long y) {
         long i = 0;
         if (x == i) {
             x = 65536;
@@ -140,7 +165,7 @@ public class Encoder {
         return (char) ((x * y) % 65537);
     }
 
-    static char addMod(long x, long y) {
+    private static char addMod(long x, long y) {
         return (char) ((x + y) % 65536);
     }
 }

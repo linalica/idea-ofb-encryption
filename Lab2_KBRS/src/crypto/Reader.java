@@ -10,8 +10,7 @@ import java.util.Scanner;
  */
 public class Reader {
 
-    public static final String INPUT = "./files/input.txt";
-
+    public static final String INPUT = "./files/input1.txt";
 
     public static String readFromFile() {
         String lines = "";
@@ -20,10 +19,10 @@ public class Reader {
             sc = new Scanner(new File(INPUT));
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
-                lines = lines + line + "\n";
+                lines += line + "\n";
             }
         } catch (FileNotFoundException e) {
-            //
+            e.printStackTrace();
         } finally {
             if (sc != null) {
                 sc.close();
