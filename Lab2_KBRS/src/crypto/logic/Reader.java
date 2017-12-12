@@ -1,4 +1,4 @@
-package crypto;
+package crypto.logic;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +10,7 @@ import java.util.Scanner;
  */
 public class Reader {
 
-    public static final String INPUT = "./files/input1.txt";
+    public static final String INPUT = "./files/input2.txt";
 
     public static String readFromFile() {
         String lines = "";

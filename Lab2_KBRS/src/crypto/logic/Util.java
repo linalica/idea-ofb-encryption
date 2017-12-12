@@ -1,4 +1,6 @@
-package crypto;
+package crypto.logic;
+
+import org.apache.commons.lang.RandomStringUtils;
 
 /**
  * @author Gulevich Ulyana
@@ -7,13 +9,14 @@ package crypto;
 public class Util {
 
 
-    static String charLineToString(char[] line) {
+    public static String charLineToString(char[] line) {
         String result = "";
         for (int i = 0; i < line.length; ++i) {
             result += line[i];
         }
         return result;
     }
+
 
     public static void printCharLineInHex(char[] line) {
         for (int i = 0; i < line.length; i++) {
@@ -34,5 +37,6 @@ public class Util {
             System.out.println(i + ": " + "0000000000000000".substring(0, 16 - binaryNum.length()) + binaryNum);
         }
     }
+
 
 }

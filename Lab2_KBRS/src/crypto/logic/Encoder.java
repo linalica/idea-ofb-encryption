@@ -1,4 +1,4 @@
-package crypto;
+package crypto.logic;
 
 import java.math.BigInteger;
 
@@ -46,10 +46,10 @@ public class Encoder {
     private static char[] round9(char[] block, char[] keys) {
         int a = 0, b = 1, c = 2, d = 3;
         char tempB = block[b];
-        block[a] = mulMod(block[a], keys[48]);
-        block[b] = addMod(block[c], keys[49]);
-        block[c] = addMod(tempB, keys[50]);
-        block[d] = mulMod(block[d], keys[51]);
+        block[a] = multiplicationMod(block[a], keys[48]);
+        block[b] = additionMod(block[c], keys[49]);
+        block[c] = additionMod(tempB, keys[50]);
+        block[d] = multiplicationMod(block[d], keys[51]);
         return block;
     }
 
@@ -63,16 +63,16 @@ public class Encoder {
         int k5 = k1 + 4;
         int k6 = k1 + 5;
         int a = 0, b = 1, c = 2, d = 3;
-        char A = mulMod(block[a], keys[k1]);
-        char B = addMod(block[b], keys[k2]);
-        char C = addMod(block[c], keys[k3]);
-        char D = mulMod(block[d], keys[k4]);
+        char A = multiplicationMod(block[a], keys[k1]);
+        char B = additionMod(block[b], keys[k2]);
+        char C = additionMod(block[c], keys[k3]);
+        char D = multiplicationMod(block[d], keys[k4]);
         char E = (char) (A ^ C);
         char F = (char) (B ^ D);
-        char G = mulMod(E, keys[k5]);
-        char H = addMod(F, G);
-        char I = mulMod(H, keys[k6]);
-        char J = addMod(G, I);
+        char G = multiplicationMod(E, keys[k5]);
+        char H = additionMod(F, G);
+        char I = multiplicationMod(H, keys[k6]);
+        char J = additionMod(G, I);
         block[a] = (char) (A ^ I);
         block[b] = (char) (C ^ I);
         block[c] = (char) (B ^ J);
@@ -86,26 +86,26 @@ public class Encoder {
 
         char[] eKeys = findEncodingKeys(key);
         char[] dKeys = new char[52];
-        dKeys[0] = multInver(eKeys[8 * 6]);
-        dKeys[1] = addInver(eKeys[8 * 6 + 1]);
-        dKeys[2] = addInver(eKeys[8 * 6 + 2]);
-        dKeys[3] = multInver(eKeys[8 * 6 + 3]);
+        dKeys[0] = multiplicativeInversion(eKeys[8 * 6]);
+        dKeys[1] = additiveInversion(eKeys[8 * 6 + 1]);
+        dKeys[2] = additiveInversion(eKeys[8 * 6 + 2]);
+        dKeys[3] = multiplicativeInversion(eKeys[8 * 6 + 3]);
         dKeys[4] = eKeys[7 * 6 + 4];
         dKeys[5] = eKeys[7 * 6 + 5];
 
         for (int r = 1; r < 8; ++r) {
-            dKeys[r * 6] = multInver(eKeys[(8 - r) * 6]);
-            dKeys[r * 6 + 1] = addInver(eKeys[(8 - r) * 6 + 2]);
-            dKeys[r * 6 + 2] = addInver(eKeys[(8 - r) * 6 + 1]);
-            dKeys[r * 6 + 3] = multInver(eKeys[(8 - r) * 6 + 3]);
+            dKeys[r * 6] = multiplicativeInversion(eKeys[(8 - r) * 6]);
+            dKeys[r * 6 + 1] = additiveInversion(eKeys[(8 - r) * 6 + 2]);
+            dKeys[r * 6 + 2] = additiveInversion(eKeys[(8 - r) * 6 + 1]);
+            dKeys[r * 6 + 3] = multiplicativeInversion(eKeys[(8 - r) * 6 + 3]);
             dKeys[r * 6 + 4] = eKeys[(7 - r) * 6 + 4];
             dKeys[r * 6 + 5] = eKeys[(7 - r) * 6 + 5];
         }
 
-        dKeys[8 * 6] = multInver(eKeys[0]);
-        dKeys[8 * 6 + 1] = addInver(eKeys[1]);
-        dKeys[8 * 6 + 2] = addInver(eKeys[2]);
-        dKeys[8 * 6 + 3] = multInver(eKeys[3]);
+        dKeys[8 * 6] = multiplicativeInversion(eKeys[0]);
+        dKeys[8 * 6 + 1] = additiveInversion(eKeys[1]);
+        dKeys[8 * 6 + 2] = additiveInversion(eKeys[2]);
+        dKeys[8 * 6 + 3] = multiplicativeInversion(eKeys[3]);
         return dKeys;
     }
 
@@ -146,15 +146,15 @@ public class Encoder {
         return keys;
     }
 
-    private static char multInver(char x) {
+    private static char multiplicativeInversion(char x) {
         return (char) new BigInteger(Integer.toString(x)).modInverse(new BigInteger("65537")).intValue();
     }
 
-    private static char addInver(long x) {
+    private static char additiveInversion(long x) {
         return (char) (65536 - x);
     }
 
-    private static char mulMod(long x, long y) {
+    private static char multiplicationMod(long x, long y) {
         long i = 0;
         if (x == i) {
             x = 65536;
@@ -165,7 +165,20 @@ public class Encoder {
         return (char) ((x * y) % 65537);
     }
 
-    private static char addMod(long x, long y) {
+    private static char additionMod(long x, long y) {
         return (char) ((x + y) % 65536);
+    }
+
+
+    // Encrypt message
+    public static byte[] encryptRSA(byte[] message, BigInteger ePublicKey, BigInteger N)
+    {
+        return (new BigInteger(message)).modPow(ePublicKey, N).toByteArray();
+    }
+
+    // Decrypt message
+    public static byte[] decryptRSA(byte[] message, BigInteger dPrivateKey, BigInteger N)
+    {
+        return (new BigInteger(message)).modPow(dPrivateKey, N).toByteArray();
     }
 }

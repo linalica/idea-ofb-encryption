@@ -1,4 +1,9 @@
-package crypto;
+package crypto.main;
+
+import crypto.logic.Encoder;
+import crypto.logic.Reader;
+import crypto.thread.Client;
+import crypto.thread.Server;
 
 /**
  * @author Gulevich Ulyana
@@ -10,8 +15,8 @@ public class Main {
 
         String text = Reader.readFromFile();
 
-        String keyFull = generateKey();
-        String initVectorStr = generateInitVrctor();
+        String keyFull = Server.generateSessionKey();
+        String initVectorStr = Server.generateInitVector();
 
         String encText = Encoder.encodeText(text, keyFull, initVectorStr);
         String decText = Encoder.encodeText(encText, keyFull, initVectorStr);
@@ -20,14 +25,8 @@ public class Main {
         System.out.println(encText);
         System.out.println(decText);
 
-    }
-
-    private static String generateKey(){
-        return "GulevichUlyana";
-    }
-
-    private static String generateInitVrctor(){
-        return "UlyanaGulevich";
+        new Thread(new Client()).start();
+        new Thread(new Server()).start();
     }
 
 
